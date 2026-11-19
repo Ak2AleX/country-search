@@ -7,7 +7,20 @@ export function debounce<A extends unknown[]>(
   fn: (...args: A) => void,
   delay: number,
 ): Debounced<A> {
-  void fn;
-  void delay;
-  throw new Error('not implemented');
+  let timerId: ReturnType<typeof setTimeout> | undefined;
+
+  const cancel = () => {
+    clearTimeout(timerId);
+    timerId = undefined;
+  };
+
+  const debounced = (...args: A) => {
+    cancel();
+    timerId = setTimeout(() => {
+      timerId = undefined;
+      fn(...args);
+    }, delay);
+  };
+
+  return Object.assign(debounced, { cancel });
 }
